@@ -20,7 +20,7 @@ import httpx
 import pandas as pd
 from pydantic import BaseModel, Field, ValidationError
 
-# 3개 API 주소를 딕셔너리로 관리 → 나중에 API가 늘어나면 여기만 추가하면 됨
+# 3개 API 주소를 딕셔너리로 관리 → 나중에 API가 늘어나면 여기에 추가할것~!
 URLS = {
     "weather": "https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.9780&hourly=temperature_2m,precipitation_probability&forecast_days=3&timezone=Asia/Seoul",
     "country": "https://countries.dev/alpha/KOR",
@@ -65,7 +65,7 @@ async def fetch(client, name, url):
     """
     resp = await client.get(url)          # await: 응답 올 때까지 이 코루틴만 대기, 다른 코루틴은 그동안 실행됨
     resp.raise_for_status()               # 상태코드가 4xx/5xx면 여기서 예외를 던짐 (200번대만 통과)
-    print(f"[응답 확인] {name}: status={resp.status_code}")  # "응답 정상 확인" 요구사항의 증거를 로그로 남김
+    print(f"[응답 확인] {name}: status={resp.status_code}")  # 응답 정상 확인: 요구사항의 증거를 로그로 남김
     return name, resp.json()              # (API이름, JSON데이터) 튜플로 반환 → 나중에 dict로 합치기 위함
 
 
@@ -98,11 +98,9 @@ async def fetch_all():
 # ====================================================================
 # 스키마 검증 (raw dict -> Pydantic 모델)
 # 모든 필드 접근을 raw.get()으로 하는 이유:
-#   raw["key"] 방식은 키가 없으면 KeyError를 던지는데, 이건 ValidationError와는
-#   다른 종류의 예외라서 아래 except 블록이 못 잡는다.
-#   raw.get("key")는 키가 없으면 그냥 None을 반환하고, 그 None이 Pydantic에
-#   전달되면 "이 필드는 str이어야 하는데 None이 왔다"는 식으로 ValidationError로
-#   통일되어 처리된다. 즉 예외 종류를 하나로 좁혀서 처리 누락을 방지하는 설계.
+#   raw.get("key")는 키가 없으면 그냥 None을 반환하고, 그 None이 Pydantic에 전달되면
+#   이 필드는 str이어야 하는데 None이 왔다-라는 식으로 ValidationError로
+#   통일되어 처리
 # =====================================================================
 def parse_weather(raw):
     """weather API의 hourly 리스트 구조(시간 배열 3개)를 한 시간대씩 레코드로 풀어서 검증"""
@@ -133,7 +131,7 @@ def parse_country(raw):
         )
     except ValidationError as e:
         print("country 검증 실패:", e)
-        return None                       # 실패 시 None 반환 → 호출부에서 "검증 실패했음"을 판단 가능
+        return None                       # 실패 시 None 반환 → 검증 실패 판단 가능
 
 
 def parse_ip(raw):
@@ -161,7 +159,7 @@ def save_csv_parquet(df, prefix):
     csv_write_time = time.time() - t0
 
     t0 = time.time()
-    pd.read_csv(f"{prefix}.csv")                 # 저장한 파일을 다시 읽어서 "읽기" 시간도 같이 측정
+    pd.read_csv(f"{prefix}.csv")                 # 저장한 파일을 다시 읽어서 읽기 시간도 같이 측정
     csv_read_time = time.time() - t0
 
     t0 = time.time()
@@ -180,7 +178,7 @@ if __name__ == "__main__":
     data = asyncio.run(fetch_all())
 
     # 2) 수집한 raw 데이터를 각각의 Pydantic 모델로 검증
-    #    "in data" 체크: 해당 API가 fetch_all()에서 실패해서 아예 없을 수도 있으므로 방어
+    #    in data 체크: 해당 API가 fetch_all()에서 실패해서 아예 없을 수도 있으므로 방어
     weather_records = parse_weather(data["weather"]) if "weather" in data else []
     country_record = parse_country(data["country"]) if "country" in data else None
     ip_record = parse_ip(data["ip"]) if "ip" in data else None
@@ -193,7 +191,7 @@ if __name__ == "__main__":
 
     # ================================================================
     # weather: CSV vs Parquet 저장 + 성능 비교
-    # weather만 성능 비교의 "대표"로 삼은 이유: 72건이라 표본이 있어서 포맷 간 속도
+    # weather만 성능 비교의 대표로 삼은 이유: 72건이라 표본이 있어서 포맷 간 속도
     # 차이를 재는 게 의미 있음. country/ip는 1건뿐이라 시간차가 사실상 노이즈 수준.
     # ================================================================
     if weather_records:
@@ -209,8 +207,6 @@ if __name__ == "__main__":
 
     # =============================================================
     # country/ip: 검증 통과 데이터도 CSV·Parquet로 저장
-    # (요구사항이 "검증 통과한 데이터"를 저장하라는 것이지 weather 한정이 아니므로,
-    #  누락되지 않게 country/ip도 동일한 포맷으로 남겨둠)
     # ==============================================================
     if country_record:
         country_df = pd.DataFrame([country_record.model_dump()])   # 1행짜리 DataFrame
