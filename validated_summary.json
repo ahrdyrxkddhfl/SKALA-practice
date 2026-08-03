@@ -1,0 +1,13 @@
+{
+  "country": {
+    "name": "Korea (Republic of)",
+    "capital": "Seoul",
+    "population": 51780579
+  },
+  "ip": {
+    "country": "United States",
+    "city": "Ashburn",
+    "lat": 39.03,
+    "lon": -77.5
+  }
+}
