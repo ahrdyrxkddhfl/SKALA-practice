@@ -1,0 +1,13 @@
+.btn-external {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: white;
+  background-color: #42b883;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-external:hover {
+  background-color: #33a06f;
+}
