@@ -8,29 +8,42 @@ const router = useRouter()
 const cityData = ref(null)
 const { displayTemp, unitSymbol } = useTemperature(() => cityData.value?.temp ?? 0)
 
-const mockDetails = {
-  city_01: { name: '서울', temp: 28, status: '맑음', humidity: 55, wind: 2.5 },
-  city_02: { name: '수원', temp: 24, status: '비', humidity: 85, wind: 4.1 },
-  city_03: { name: '부산', temp: 26, status: '구름', humidity: 65, wind: 5.0 },
-  city_04: { name: '고양', temp: 28, status: '흐림', humidity: 70, wind: 3.2 },
-  city_05: { name: '성남', temp: 29, status: '비', humidity: 85, wind: 2.1 },
+import { fetchWeatherDetail } from '@/services/weatherApi'
+import DustBadge from '@/components/weather/DustBadge.vue'
+
+const isLoading = ref(false)
+const errorMessage = ref('')
+
+async function loadWeatherDetail() {
+  isLoading.value = true
+  errorMessage.value = ''
+
+  try {
+    cityData.value = await fetchWeatherDetail(String(route.params.cityId))
+    if (!cityData.value) errorMessage.value = '등록되지 않은 도시입니다.'
+  } catch (error) {
+    console.error(error)
+    errorMessage.value = '상세 날씨 정보를 불러오지 못했습니다.'
+  } finally {
+    isLoading.value = false
+  }
 }
 
-// 컴포넌트가 화면에 연결된 뒤 URL의 cityId를 읽습니다.
-onMounted(() => {
-  cityData.value = mockDetails[String(route.params.cityId)] ?? null
-})
+onMounted(loadWeatherDetail)
 </script>
 
 <template>
   <section>
     <h2>상세 날씨</h2>
-    <div v-if="cityData">
+    <p v-if="isLoading">데이터를 불러오는 중입니다...</p>
+    <p v-else-if="errorMessage">{{ errorMessage }}</p>
+    <div v-else-if="cityData">
       <h3>{{ cityData.name }}</h3>
       <p>기온: {{ displayTemp }}{{ unitSymbol }}</p>
       <p>날씨: {{ cityData.status }}</p>
       <p>습도: {{ cityData.humidity }}%</p>
       <p>풍속: {{ cityData.wind }}m/s</p>
+      <p>미세먼지: {{ cityData.dust }} <DustBadge :dust="cityData.dust" /></p>
     </div>
     <button @click="router.push('/')">홈으로 돌아가기</button>
   </section>

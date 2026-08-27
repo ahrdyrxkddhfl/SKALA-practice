@@ -38,3 +38,5 @@ __screenshots__/
 # Vite
 *.timestamp-*-*.mjs
 _참고_보관/
+
+./env.local

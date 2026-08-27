@@ -1,5 +1,6 @@
 <script setup>
-import { computed, ref, watch, watchEffect } from 'vue'
+import { computed, onMounted, ref, watch, watchEffect } from 'vue'
+import { fetchWeatherList } from '@/services/weatherApi'
 import BaseDashboardCard from './BaseDashboardCard.vue'
 import SearchBar from './SearchBar.vue'
 import WeatherCard from './WeatherCard.vue'
@@ -14,34 +15,9 @@ function goDetail(cityId) {
   router.push({ name: 'WeatherDetail', params: { cityId } })
 }
 //화면을 먼저 만들기 위해 실제 API 대신 가상 날씨 데이터를 사용.
-const weatherList = ref([
-  {
-    id: 'city_01',
-    name: '서울',
-    temp: 28,
-    status: '맑음',
-    humidity: 12,
-    dust: 12,
-  },
-  { id: 'city_02', name: '수원', temp: 24, status: '비', humidity: 88, dust: 78 },
-  {
-    id: 'city_03',
-    name: '부산',
-    temp: 26,
-    status: '구름',
-    humidity: 40,
-    dust: 91,
-  },
-  {
-    id: 'city_04',
-    name: '고양',
-    temp: 28,
-    status: '흐림',
-    humidity: 80,
-    dust: 50,
-  },
-  { id: 'city_05', name: '성남', temp: 29, status: '비', humidity: 92, dust: 20 },
-])
+const weatherList = ref([])
+const isLoading = ref(false)
+const errorMessage = ref('')
 
 const searchQuery = ref('')
 const selectedCityInfo = ref('도시 카드를 선택해보세요.')
@@ -62,6 +38,22 @@ const visibleWeatherList = computed(() => {
 const badDustCount = computed(() => {
   return visibleWeatherList.value.filter((city) => city.dust >= 81).length
 })
+
+async function loadWeather() {
+  isLoading.value = true
+  errorMessage.value = ''
+
+  try {
+    weatherList.value = await fetchWeatherList()
+  } catch (error) {
+    console.error(error)
+    errorMessage.value = '날씨 정보를 불러오지 못했습니다. API Key와 네트워크 상태를 확인하세요.'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(loadWeather)
 
 watch(selectedCityInfo, (message) => console.log('[watch]', message))
 watch(
@@ -90,14 +82,18 @@ watchEffect(() => {
 
     <BaseDashboardCard>
       <template #title><h2>지역별 날씨 현황</h2></template>
-      <WeatherCard
-        v-for="city in visibleWeatherList"
-        :key="city.id"
-        :city-item="city"
-        @select-card="(message) => (selectedCityInfo = message)"
-        @click-detail="goDetail"
-      />
-      <p v-if="visibleWeatherList.length === 0">검색 결과가 없습니다.</p>
+      <p v-if="isLoading">날씨 정보를 불러오는 중입니다...</p>
+      <p v-else-if="errorMessage">{{ errorMessage }}</p>
+      <template v-else>
+        <WeatherCard
+          v-for="city in visibleWeatherList"
+          :key="city.id"
+          :city-item="city"
+          @select-card="(message) => (selectedCityInfo = message)"
+          @click-detail="goDetail"
+        />
+        <p v-if="visibleWeatherList.length === 0">검색 결과가 없습니다.</p>
+      </template>
     </BaseDashboardCard>
 
     <p class="status-bar">{{ selectedCityInfo }}</p>
