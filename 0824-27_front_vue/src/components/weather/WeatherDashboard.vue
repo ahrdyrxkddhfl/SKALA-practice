@@ -1,11 +1,14 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 import BaseDashboardCard from './BaseDashboardCard.vue'
 import SearchBar from './SearchBar.vue'
 import WeatherCard from './WeatherCard.vue'
 import { useRouter } from 'vue-router'
 import FilterBar from './FilterBar.vue'
+import { useFavoriteStore } from '@/stores/favoriteStore.js'
+
 const router = useRouter()
+const favoriteStore = useFavoriteStore()
 
 function goDetail(cityId) {
   router.push({ name: 'WeatherDetail', params: { cityId } })
@@ -19,9 +22,8 @@ const weatherList = ref([
     status: '맑음',
     humidity: 12,
     dust: 12,
-    favorite: false,
   },
-  { id: 'city_02', name: '수원', temp: 24, status: '비', humidity: 88, dust: 78, favorite: false },
+  { id: 'city_02', name: '수원', temp: 24, status: '비', humidity: 88, dust: 78 },
   {
     id: 'city_03',
     name: '부산',
@@ -29,7 +31,6 @@ const weatherList = ref([
     status: '구름',
     humidity: 40,
     dust: 91,
-    favorite: false,
   },
   {
     id: 'city_04',
@@ -38,9 +39,8 @@ const weatherList = ref([
     status: '흐림',
     humidity: 80,
     dust: 50,
-    favorite: true,
   },
-  { id: 'city_05', name: '성남', temp: 29, status: '비', humidity: 92, dust: 20, favorite: true },
+  { id: 'city_05', name: '성남', temp: 29, status: '비', humidity: 92, dust: 20 },
 ])
 
 const searchQuery = ref('')
@@ -53,14 +53,10 @@ const filteredWeatherList = computed(() => {
   return weatherList.value.filter((city) => city.name.includes(query))
 })
 
-const favoriteCount = computed(() => {
-  return weatherList.value.filter((city) => city.favorite).length
-})
-
 const showFavoriteOnly = ref(false)
 const visibleWeatherList = computed(() => {
   if (!showFavoriteOnly.value) return filteredWeatherList.value
-  return filteredWeatherList.value.filter((city) => city.favorite)
+  return filteredWeatherList.value.filter((city) => favoriteStore.isFavorite(city.id))
 })
 
 const badDustCount = computed(() => {
@@ -68,13 +64,15 @@ const badDustCount = computed(() => {
 })
 
 watch(selectedCityInfo, (message) => console.log('[watch]', message))
-watch(favoriteCount, (newCount, oldCount) => {
-  console.log(`즐겨찾기 개수 변경: ${oldCount}개 -> ${newCount}개`)
+watch(
+  () => favoriteStore.favoriteCount,
+  (newCount, oldCount) => {
+    console.log(`[watch] 즐겨찾기 개수 변경: ${oldCount}개 -> ${newCount}개`)
+  },
+)
+watchEffect(() => {
+  console.log('[watchEffect] 검색어:', searchQuery.value)
 })
-
-function toggleFavorite(city) {
-  city.favorite = !city.favorite
-}
 </script>
 
 <template>
@@ -84,7 +82,7 @@ function toggleFavorite(city) {
       <SearchBar :current-query="searchQuery" @update-query="(value) => (searchQuery = value)" />
       <FilterBar
         :show-favorite-only="showFavoriteOnly"
-        :favorite-count="favoriteCount"
+        :favorite-count="favoriteStore.favoriteCount"
         :bad-dust-count="badDustCount"
         @update-favorite-only="(value) => (showFavoriteOnly = value)"
       />
@@ -98,7 +96,6 @@ function toggleFavorite(city) {
         :city-item="city"
         @select-card="(message) => (selectedCityInfo = message)"
         @click-detail="goDetail"
-        @toggle-favorite="toggleFavorite"
       />
       <p v-if="visibleWeatherList.length === 0">검색 결과가 없습니다.</p>
     </BaseDashboardCard>

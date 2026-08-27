@@ -1,10 +1,12 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useTemperature } from '@/composables/useTemperature'
 
 const route = useRoute()
 const router = useRouter()
 const cityData = ref(null)
+const { displayTemp, unitSymbol } = useTemperature(() => cityData.value?.temp ?? 0)
 
 const mockDetails = {
   city_01: { name: '서울', temp: 28, status: '맑음', humidity: 55, wind: 2.5 },
@@ -25,7 +27,7 @@ onMounted(() => {
     <h2>상세 날씨</h2>
     <div v-if="cityData">
       <h3>{{ cityData.name }}</h3>
-      <p>기온: {{ cityData.temp }}℃</p>
+      <p>기온: {{ displayTemp }}{{ unitSymbol }}</p>
       <p>날씨: {{ cityData.status }}</p>
       <p>습도: {{ cityData.humidity }}%</p>
       <p>풍속: {{ cityData.wind }}m/s</p>
