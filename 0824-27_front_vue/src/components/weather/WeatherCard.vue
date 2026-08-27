@@ -9,7 +9,7 @@ const props = defineProps({
 
 const emit = defineEmits(['select-card', 'click-detail'])
 
-//부모가 넘겨준 섭씨 값을 composable에 전달.
+// 부모가 넘겨준 섭씨 값을 composable에 전달.
 const { displayTemp, unitSymbol } = useTemperature(() => props.cityItem.temp)
 
 const favoriteStore = useFavoriteStore()
@@ -24,23 +24,30 @@ const favoriteStore = useFavoriteStore()
     <p>현재 기온: {{ displayTemp }}{{ unitSymbol }}</p>
     <p>날씨: {{ props.cityItem.status }}</p>
     <p>습도: {{ props.cityItem.humidity }}%</p>
-    <DustBadge :dust="props.cityItem.dust" />
 
-    <span v-if="props.cityItem.temp >= 25">더움</span>
-    <span v-else>선선함</span>
+    <div class="card-row">
+      <DustBadge :dust="props.cityItem.dust" />
 
-    <button @click.stop="emit('click-detail', props.cityItem.id)">상세보기</button>
-    <button @click.stop="favoriteStore.toggleFavorite(props.cityItem.id)">
-      {{ favoriteStore.isFavorite(props.cityItem.id) ? '★ 해제' : '☆ 즐겨찾기' }}
-    </button>
+      <el-tag v-if="props.cityItem.temp >= 25" type="danger">더움</el-tag>
+      <el-tag v-else type="primary">선선함</el-tag>
+
+      <el-button type="primary" size="small" @click.stop="emit('click-detail', props.cityItem.id)">
+        상세보기
+      </el-button>
+
+      <el-button size="small" @click.stop="favoriteStore.toggleFavorite(props.cityItem.id)">
+        {{ favoriteStore.isFavorite(props.cityItem.id) ? '★ 해제' : '☆ 즐겨찾기' }}
+      </el-button>
+    </div>
   </article>
 </template>
 
 <style scoped>
-.weather-card {
-  margin: 12px 0;
-  padding: 16px;
-  border: 1px solid gainsboro;
-  border-radius: 8px;
+.card-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
 }
 </style>
