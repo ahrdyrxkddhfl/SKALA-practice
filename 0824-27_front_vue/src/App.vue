@@ -13,6 +13,7 @@ provide('appTitle', 'Vue Weather Dashboard')
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/favorite">즐겨찾기</RouterLink>
       </nav>
       <UnitToggler />
     </header>
@@ -20,3 +21,11 @@ provide('appTitle', 'Vue Weather Dashboard')
     <RouterView />
   </div>
 </template>
+
+<style scoped>
+nav {
+  display: flex;
+  gap: 12px;
+  margin: 8px 0;
+}
+</style>

@@ -24,6 +24,9 @@ const favoriteStore = useFavoriteStore()
     <p>현재 기온: {{ displayTemp }}{{ unitSymbol }}</p>
     <p>날씨: {{ props.cityItem.status }}</p>
     <p>습도: {{ props.cityItem.humidity }}%</p>
+    <p v-if="props.cityItem.tomorrowMax !== null">
+      내일: {{ props.cityItem.tomorrowMin }}°C ~ {{ props.cityItem.tomorrowMax }}°C
+    </p>
 
     <div class="card-row">
       <DustBadge :dust="props.cityItem.dust" />

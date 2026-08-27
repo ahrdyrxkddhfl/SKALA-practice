@@ -61,7 +61,33 @@ const STATUS_MAP = {
   악천후: '폭풍',
 }
 
-function normalizeWeather(city, data, dust) {
+const forecastClient = axios.create({
+  baseURL: 'https://api.open-meteo.com/v1/forecast',
+  timeout: 7000,
+})
+
+// [기타 외부 API] Open-Meteo에서 내일 최고/최저 기온을 가져온다. (API Key 불필요)
+async function requestTomorrow(city) {
+  try {
+    const { data } = await forecastClient.get('', {
+      params: {
+        latitude: city.lat,
+        longitude: city.lon,
+        daily: 'temperature_2m_max,temperature_2m_min',
+        timezone: 'Asia/Seoul',
+      },
+    })
+    return {
+      tomorrowMax: data.daily?.temperature_2m_max?.[1] ?? null,
+      tomorrowMin: data.daily?.temperature_2m_min?.[1] ?? null,
+    }
+  } catch (error) {
+    console.error('내일 예보 조회 실패:', error)
+    return { tomorrowMax: null, tomorrowMin: null }
+  }
+}
+
+function normalizeWeather(city, data, dust, forecast) {
   const raw = data.weather?.[0]?.description ?? '정보 없음'
   return {
     id: city.id,
@@ -71,13 +97,20 @@ function normalizeWeather(city, data, dust) {
     humidity: data.main.humidity,
     wind: data.wind.speed,
     dust,
+    tomorrowMax: forecast.tomorrowMax,
+    tomorrowMin: forecast.tomorrowMin,
   }
 }
+
 export async function fetchWeatherList() {
   return Promise.all(
     CITY_LIST.map(async (city) => {
-      const [data, dust] = await Promise.all([requestWeather(city), requestDust(city)])
-      return normalizeWeather(city, data, dust)
+      const [data, dust, forecast] = await Promise.all([
+        requestWeather(city),
+        requestDust(city),
+        requestTomorrow(city),
+      ])
+      return normalizeWeather(city, data, dust, forecast)
     }),
   )
 }
@@ -86,6 +119,10 @@ export async function fetchWeatherDetail(cityId) {
   const city = CITY_LIST.find((item) => item.id === cityId)
   if (!city) return null
 
-  const [data, dust] = await Promise.all([requestWeather(city), requestDust(city)])
-  return normalizeWeather(city, data, dust)
+  const [data, dust, forecast] = await Promise.all([
+    requestWeather(city),
+    requestDust(city),
+    requestTomorrow(city),
+  ])
+  return normalizeWeather(city, data, dust, forecast)
 }

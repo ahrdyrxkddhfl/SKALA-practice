@@ -27,6 +27,11 @@ const router = createRouter({
       component: () => import('@/views/NotFoundView.vue'),
     },
     {
+      path: '/favorite',
+      name: 'WeatherFavorite',
+      component: () => import('@/views/WeatherFavoriteView.vue'),
+    },
+    {
       path: '/:pathMatch(.*)*',
       redirect: { name: 'NotFound' },
     },
