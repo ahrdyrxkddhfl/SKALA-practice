@@ -21,23 +21,17 @@ const items = ref([
 
     <h3>1) 배열 렌더링</h3>
     <ul>
-      <li v-for="(fruit, index) in fruits" :key="index">
-        {{ index + 1 }}번 과일: {{ fruit }}
-      </li>
+      <li v-for="(fruit, index) in fruits" :key="index">{{ index + 1 }}번 과일: {{ fruit }}</li>
     </ul>
 
     <h3>2) 객체 렌더링</h3>
     <ul>
-      <li v-for="(value, key, index) in user" :key="key">
-        [{{ index }}] {{ key }} : {{ value }}
-      </li>
+      <li v-for="(value, key, index) in user" :key="key">[{{ index }}] {{ key }} : {{ value }}</li>
     </ul>
 
     <h3>3) 배열 내 객체 렌더링</h3>
     <ul>
-      <li v-for="(item, index) in items" :key="item.id">
-        [{{ index }}] {{ item.name }}
-      </li>
+      <li v-for="(item, index) in items" :key="item.id">[{{ index }}] {{ item.name }}</li>
     </ul>
   </div>
 </template>

@@ -23,9 +23,7 @@ const extraStyle = ref({
     <h2>v-bind 디렉티브 고급 (스타일 바인딩)</h2>
 
     <h3>1) 객체 형식 (인라인 직접 작성)</h3>
-    <p :style="{ fontSize: fontSize + 'px', color: textColor }">
-      글자 크기: {{ fontSize }}px
-    </p>
+    <p :style="{ fontSize: fontSize + 'px', color: textColor }">글자 크기: {{ fontSize }}px</p>
     <button @click="fontSize += 2">키우기</button>&nbsp;
     <button @click="fontSize -= 2">줄이기</button>&nbsp;
     <button @click="textColor = '#e74c3c'">빨갛게</button>

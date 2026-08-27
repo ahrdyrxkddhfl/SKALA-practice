@@ -48,7 +48,11 @@ const price = ref('')
     <!-- 4) 수식어 체이닝 (Chaining) 실습 -->
     <section>
       <h3>4) Chaining (수식어 체이닝: .trim.number)</h3>
-      <input type="text" v-model.trim.number="price" placeholder="공백과 숫자를 섞어 입력해 보세요" />
+      <input
+        type="text"
+        v-model.trim.number="price"
+        placeholder="공백과 숫자를 섞어 입력해 보세요"
+      />
       <p>
         처리된 값: <strong>"{{ price }}"</strong>
       </p>

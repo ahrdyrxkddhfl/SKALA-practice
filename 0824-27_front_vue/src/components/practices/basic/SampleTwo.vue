@@ -1,6 +1,4 @@
 <script setup>
-import { ref } from 'vue'
-
 const welcomeMessage = 'Welcome to Skala-Vue'
 </script>
 
@@ -10,4 +8,5 @@ const welcomeMessage = 'Welcome to Skala-Vue'
     <p>{{ welcomeMessage.toUpperCase() }}</p>
     <p>{{ 'Random number: ' + Math.ceil(Math.random() * 100) }}</p>
   </div>
-</template>Qk
+</template>
+Qk

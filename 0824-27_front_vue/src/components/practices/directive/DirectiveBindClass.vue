@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 
-const isWarning = ref(false)      // 객체 바인딩용 스위치
+const isWarning = ref(false) // 객체 바인딩용 스위치
 const themeClass = ref('bg-dark') // 배열 바인딩용 고정 클래스
 </script>
 
@@ -15,9 +15,7 @@ const themeClass = ref('bg-dark') // 배열 바인딩용 고정 클래스
     <br />
 
     <h3>클래스 바인딩 (배열 형식)</h3>
-    <div :class="[themeClass, isWarning ? 'text-danger' : 'text-safe']">
-      배열 형식 바인딩 결과
-    </div>
+    <div :class="[themeClass, isWarning ? 'text-danger' : 'text-safe']">배열 형식 바인딩 결과</div>
   </div>
 </template>
 

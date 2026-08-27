@@ -2,8 +2,8 @@
 import { ref } from 'vue'
 
 const comment = ref('')
-const isAgreed = ref(false)      // 단일 체크박스는 Boolean
-const favoriteFruits = ref([])   // 다중 체크박스는 반드시 배열([])로 시작!
+const isAgreed = ref(false) // 단일 체크박스는 Boolean
+const favoriteFruits = ref([]) // 다중 체크박스는 반드시 배열([])로 시작!
 const gender = ref('')
 const selectedCar = ref('')
 </script>

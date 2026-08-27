@@ -31,5 +31,8 @@ const emit = defineEmits(['update-favorite-only'])
   margin-top: 10px;
   font-size: 13px;
 }
-.warn { color: orangered; font-weight: bold; }
+.warn {
+  color: orangered;
+  font-weight: bold;
+}
 </style>

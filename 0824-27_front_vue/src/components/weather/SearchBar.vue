@@ -29,3 +29,17 @@ const emit = defineEmits(['update-query'])
   text-align: center;
 }
 </style>
+
+<style scoped>
+.search-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.search-echo {
+  margin: 0;
+  font-size: 13px;
+  color: darkgray;
+}
+</style>

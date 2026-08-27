@@ -12,3 +12,9 @@ defineProps({
   <el-tag v-else-if="dust >= 31" type="warning">미세먼지 보통</el-tag>
   <el-tag v-else type="success">미세먼지 좋음</el-tag>
 </template>
+
+<style scoped>
+.el-tag {
+  font-weight: bold;
+}
+</style>
